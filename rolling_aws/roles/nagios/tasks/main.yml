@@ -37,5 +37,20 @@
     - lbservers.cfg
   notify: restart nagios
 
+- name: ensure this directory exists
+  file:
+    path: /var/log/nagios/spool/checkresults
+    state: directory
+    owner: nagios
+    group: nagios
+
+- name: set exec on nagios.cmd file
+  file:
+     path: /var/spool/nagios/cmd/nagios.cmd
+     mode: "u=rwx,g=rx,o=r"
+
 - name: start nagios
   service: name=nagios state=started enabled=yes
+
+- name: Set account password
+  command: htpasswd -b /etc/nagios/passwd nagiosadmin n@g10s 

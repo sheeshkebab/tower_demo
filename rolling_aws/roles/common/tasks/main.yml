@@ -7,8 +7,9 @@
    - libselinux-python
    - libsemanage-python
 
-- name: Create the repository for EPEL
-  copy: src=epel.repo dest=/etc/yum.repos.d/epel.repo
+# Using the epel role moving forward
+#- name: Create the repository for EPEL
+#  copy: src=epel.repo dest=/etc/yum.repos.d/epel.repo
 
 - name: Create the GPG key for EPEL
   copy: src=RPM-GPG-KEY-EPEL-6 dest=/etc/pki/rpm-gpg
@@ -22,6 +23,12 @@
    - nagios-plugins-procs
    - nagios-plugins-load
    - nagios-plugins-disk
+
+- name: set the correct timezone
+  file:
+    src: /usr/share/zoneinfo/Australia/Sydney
+    dest: /etc/timezone
+    state: link
 
 - name: Install ntp
   yum: name=ntp state=present
@@ -41,6 +48,9 @@
   template: src=iptables.j2 dest=/etc/sysconfig/iptables
   when: ansible_distribution_major_version != '7'
   notify: restart iptables
+
+- selinux:
+    state: disabled
 
 - name: test to see if selinux is running
   command: getenforce

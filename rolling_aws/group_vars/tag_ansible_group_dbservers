@@ -7,3 +7,14 @@ mysql_port: 3306
 dbuser: root
 dbname: foodb
 upassword: abc
+
+
+mysql_root_home: /root
+mysql_root_username: root
+mysql_root_password: abc 
+mysql_enabled_on_startup: yes
+mysql_databases:
+   - name: foodb
+     collation: utf8_general_ci
+     encoding: utf8
+     replicate: 0

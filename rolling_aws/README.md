@@ -1,8 +1,8 @@
 LAMP Stack + HAProxy: Example Playbooks for Amazon Web Services
 -----------------------------------------------------------------------------
 
-- Requires Ansible 1.2
-- Expects CentOS/RHEL 6 hosts
+- Requires Ansible 2.5
+- Expects CentOS/RHEL 7 hosts
 
 This example is an extension of the simple LAMP deployment. Here we'll install
 and configure a web server with an HAProxy load balancer in front, and deploy
@@ -40,7 +40,7 @@ should have you hit different webservers.
 
 The Nagios web interface can be reached at http://<ip-of-nagios>/nagios/
 
-The default username and password are "nagiosadmin" / "nagiosadmin".
+The default username and password are "nagiosadmin" / "n@g10s".
 
 ### Removing and Adding a Node
 
