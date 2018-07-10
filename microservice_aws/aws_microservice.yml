@@ -1,0 +1,257 @@
+---
+- name: Multi purpose EC2 playbook - use the create or delete tag
+  hosts: localhost
+  gather_facts: False
+  vars:
+    vm_count: 1
+    security_group: 'sg-036c04403f8194aba'
+    subnet_id: 'subnet-c3295a8a'
+    ssh_key_name: 'etg-richard'
+    instance_size: 't2.micro'
+    instance_tag: 'cattle'
+    ami_name: 'ami-1987757b'    # This is the RHEL AMI
+    dynamic_inventory_tag: []
+
+  tasks:
+  # https://aws.amazon.com/ec2/instance-types/
+  # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html
+  - name: Create RHEL instance in ec2
+    ec2:
+      image: "{{ ami_name }}"
+      instance_type: "{{ instance_size }}"
+      aws_access_key: "{{ my_aws_access_key }}"
+      aws_secret_key: "{{ my_aws_secret_key }}"
+      key_name: "{{ ssh_key_name }}"
+      region: 'ap-southeast-2'
+      wait: yes 
+      count: "{{ vm_count|int }}"
+      instance_tags:
+        Ansible: "{{ instance_tag }}"
+      vpc_subnet_id: "{{ subnet_id }}"
+      assign_public_ip: yes
+      group_id: "{{ security_group }}"  # or you can say 'default' here
+    register: ec2
+
+  - name: Wait for SSH to come up
+    wait_for:
+      host: "{{ item.public_dns_name }}"
+      port: 22
+      delay: 60
+      timeout: 320
+      state: started
+    with_items: "{{ ec2.instances }}"
+
+#  - name: Enumerate all tagged instances in ec2
+#    ec2_instance_facts:
+#      region: 'ap-southeast-2'
+#      filters:
+#        "tag:Ansible": "{{ instance_tag }}" 
+#    register: vmfacts 
+
+#  - debug: msg="{{ ec2.instance_id }}"
+#    with_items: '{{ ec2.instances }}'
+
+  - name: Populate dictionary for inventory import 
+    set_fact:
+      dynamic_inventory_tag: "{{ dynamic_inventory_tag|default([]) + [ {'instance_id': item.id, 'ip': item.public_ip} ] }}"
+      #dynamic_inventory_tag: "{{ dynamic_inventory_tag|default([]) + [ {'instance_id': item.instance_id, 'ip': item.public_ip_address} ] }}"
+    with_items: "{{ ec2.instances }}"
+
+  - name: add host to in memory inventory
+    add_host:
+      hostname: "{{ item.instance_id }}"
+      ansible_host: "{{ item.ip }}"
+      groups: tag_Ansible_"{{ instance_tag }}" 
+    with_items: "{{ dynamic_inventory_tag }}"
+
+- name : Configure the Redhat subscription
+  hosts: tag_Ansible_cattle 
+  become: yes
+  gather_facts: yes
+  vars:
+    rhsm_hostname: subscription.rhsm.redhat.com
+    rhsm_prefix: '/subscription'
+    rhsm_baseurl: 'https://cdn.redhat.com'
+    mylablogin: 'gecos'
+    rhnlogin: 'rhn-sa-rhailsto'
+  tasks:
+
+  - name: set the correct timezone
+    file:
+      src: /usr/share/zoneinfo/Australia/Sydney
+      dest: /etc/timezone
+      state: link
+
+  - name: Check if we are on an EC2 instance..?
+    uri:
+      url: http://169.254.169.254/latest/meta-data/public-ipv4/
+      return_content: yes
+    register: webpage
+
+  - debug: var=webpage.msg
+  #- debug: var=inventory_hostname
+
+  - name: disable RHUI update infrastructure
+    lineinfile:
+      path: /etc/yum/pluginconf.d/rhui-lb.conf
+      regexp: '^enabled=1'
+      line: 'enabled=0'
+
+  - name: Remove RHN systemid file 
+    file:
+      name: /etc/sysconfig/rhn/systemid 
+      state: absent 
+    when: "'OK' in webpage.msg"
+
+  - name: Find repository files
+    find:
+      paths: /etc/yum.repos.d/
+      patterns: '*.repo'
+    register: repos
+    when: "'OK' in webpage.msg"
+
+  - name: Remove all YUM repositories
+    file:
+      name: "{{ item.path }}"
+      state: absent
+    with_items: "{{ repos.files }}"
+    when: "'OK' in webpage.msg"
+
+  - name: put the rhsm configuration file in place
+    template:
+      src: templates/rhsm.conf.j2
+      dest: /etc/rhsm/rhsm.conf
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Subscribe the system to a specific pool by ID.
+    redhat_subscription:
+      state: present
+      username: "{{ rhnlogin }}"
+      password: "{{ vault_subscription_manager_password }}"
+      auto_attach: true
+      #pool: '8a85f98b635f3e6d0163cd94eebc65b4'
+      force_register: yes
+
+  - name: Enable specific RHEL 7 subscription repos
+    command: /sbin/subscription-manager repos --enable={{ item }}
+    with_items:
+      - 'rhel-7-server-rpms'
+      - 'rhel-7-server-extras-rpms'
+      - 'rhel-7-server-rhn-tools-rpms'
+      - 'rhel-7-server-optional-rpms'
+
+  - name: Install yum-cron
+    yum:
+      name: yum-cron
+      state: latest
+
+  - name: Enable yum-cron
+    service:
+      name: yum-cron.service
+      state: started
+
+
+- name : builds a basic python flask microservice
+  hosts: tag_Ansible_cattle
+  gather_facts: True 
+  become: True
+
+  vars:
+    pip_install_packages:
+      - name: click
+        virtualenv: /todo/venv
+      - name: configobj
+        virtualenv: /todo/venv
+      - name: Flask
+        virtualenv: /todo/venv
+      - name: itsdangerous
+        virtualenv: /todo/venv
+      - name: Jinja2
+        virtualenv: /todo/venv
+      - name: MarkupSafe
+        virtualenv: /todo/venv
+      - name: requests
+        virtualenv: /todo/venv
+      - name: simplejson
+        virtualenv: /todo/venv
+      - name: six
+        virtualenv: /todo/venv
+      - name: Werkzeug
+        virtualenv: /todo/venv
+
+  pre_tasks:
+
+  - name: Install python virtual env
+    yum:
+      name: python-virtualenv
+      state: present
+
+  roles:
+    - geerlingguy.repo-epel 
+    - geerlingguy.pip
+
+  tasks:
+  
+  - name: install git
+    yum:
+      name: git
+      state: present
+
+  - selinux:
+      state: disabled
+
+#  - name: Disable SElinux permanetly
+#      lineinfile: dest=/etc/sysconfig/selinux state=present create=no regexp='SELINUX=.*' line='SELINUX=disabled'
+
+  - stat: path=/todo/app/dependencies.ini
+    register: app_installed 
+ 
+  - name: install microservice application
+    git:
+      repo: 'https://github.com/h4xr/todo.git'
+      dest: /todo/app
+    when: app_installed.stat.exists == False
+
+#  - name: Set microservice listener interface 
+#    lineinfile:
+#      path: /todo/app/dependencies.ini
+#      regexp: '^host = \"localhost\"'
+#      line: 'host = "{{ ansible_eth0["ipv4"]["address"] }}"'
+
+  - name: Start microservice
+    shell: "source venv/bin/activate && cd app && nohup python run.py"
+    args:
+      chdir: /todo
+      executable: /bin/bash
+
+  - yum:
+      name: nginx
+      state: present
+
+  - name: Start service nginx, if not running
+    service:
+      name: nginx
+      state: started
+
+  - name: place ngix api config file into its location
+    copy:
+      src: files/api.conf
+      dest: /etc/nginx/conf.d/api.conf
+      mode: 0644
+    notify: Restart Nginx
+
+  - name: place ngix config file into its location
+    copy:
+      src: files/nginx.conf
+      dest: /etc/nginx/nginx.conf
+      mode: 0644
+    notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      become: true
+      service:
+        name: nginx
+        state: restarted
