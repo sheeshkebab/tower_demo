@@ -3,32 +3,33 @@
   hosts: localhost
   gather_facts: False
   vars:
-    vm_count: 1
-    security_group: 'sg-036c04403f8194aba'
-    subnet_id: 'subnet-c3295a8a'
-    ssh_key_name: 'etg-richard'
-    instance_size: 't2.micro'
+    instance_count: 1
+    #security_group: 'sg-036c04403f8194aba'
+    #subnet_id: 'subnet-c3295a8a'
+    #ssh_key_name: 'etg-richard'
+    #instance_size: 't2.micro'
     instance_tag: 'cattle'
-    ami_name: 'ami-1987757b'    # This is the RHEL AMI
+    #ami_name: 'ami-1987757b'    # This is the RHEL AMI
 
   tasks:
   # https://aws.amazon.com/ec2/instance-types/
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html
   - name: Create RHEL instance in ec2
     ec2:
-      image: "{{ ami_name }}"
-      instance_type: "{{ instance_size }}"
-      aws_access_key: "{{ my_aws_access_key }}"
-      aws_secret_key: "{{ my_aws_secret_key }}"
-      key_name: "{{ ssh_key_name }}"
-      region: 'ap-southeast-2'
+      image: "{{ ec2_image }}"
+      instance_type: "{{ ec2_instance_type }}"
+      aws_access_key: "{{ ec2_access_key }}"
+      aws_secret_key: "{{ ec2_secret_key }}"
+      key_name: "{{ ec2_keypair }}"
+      region: "{{ ec2_region }}" 
       wait: yes 
-      count: "{{ vm_count|int }}"
-      instance_tags:
-        Ansible: "{{ instance_tag }}"
-      vpc_subnet_id: "{{ subnet_id }}"
+      count: "{{ instance_count|int }}"
+      instance_tags: "{'ansible_group':'{{ instance_tag }}', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'demo_''{{ tower_user_name }}'}"
+      #instance_tags:
+      #  Ansible: "{{ instance_tag }}"
+      vpc_subnet_id: "{{ ec2_subnet_id }}"
       assign_public_ip: yes
-      group_id: "{{ security_group }}"  # or you can say 'default' here
+      group_id: "{{ ec2_security_group }}"  # you can say 'default' here
     register: ec2
     tags: create
 
@@ -44,9 +45,9 @@
 
   - name: Enumerate all tagged instances in ec2
     ec2_instance_facts:
-      region: 'ap-southeast-2'
+      region: "{{ ec2_region }}" 
       filters:
-        "tag:Ansible": "{{ instance_tag }}" 
+        "tag:ansible_group": "{{ instance_tag }}" 
     register: vmfacts 
     tags: 
       - delete
@@ -60,9 +61,9 @@
 
   - name: Delete ami instance in ec2
     ec2:
-      aws_access_key: "{{ my_aws_access_key }}"
-      aws_secret_key: "{{ my_aws_secret_key }}"
-      region: 'ap-southeast-2'
+      aws_access_key: "{{ ec2_access_key }}"
+      aws_secret_key: "{{ ec2_secret_key }}"
+      region: "{{ ec2_region }}" 
       state: absent
       instance_ids: '{{ item.instance_id }}'
     with_items: '{{ vmfacts.instances }}'
