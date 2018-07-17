@@ -45,6 +45,8 @@
 
   - name: Enumerate all tagged instances in ec2
     ec2_instance_facts:
+      aws_access_key: "{{ ec2_access_key }}"
+      aws_secret_key: "{{ ec2_secret_key }}"
       region: "{{ ec2_region }}" 
       filters:
         "tag:ansible_group": "{{ instance_tag }}" 
