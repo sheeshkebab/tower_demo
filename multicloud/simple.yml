@@ -2,11 +2,11 @@
 - name : Simple playbook
   hosts: localhost 
   vars:
-    cloud_provider: '' 
+    cloud_provider: 'ec2'
 
   tasks:
   
-  - block:
+    - block:
       - name: Create security group that allows SSH
         azure_rm_securitygroup:
           resource_group: ansibletower 
@@ -18,23 +18,20 @@
               access: Allow
               priority: 101
               direction: Inbound
-    when: cloud_provider == 'azure'
+      when: cloud_provider == 'azure'
 
-  - block:
-    - name: Enumerate ec2 instances by tag
-      ec2_instance_facts:
-        aws_access_key: "{{ ec2_access_key }}"
-        aws_secret_key: "{{ ec2_secret_key }}"
-        region: "{{ ec2_region }}"
-        filters:
-          "tag:ansible_group": "{{ instance_tag }}"
-      register: vmfacts
+    - block:
+      - name: Enumerate ec2 instances by tag
+        ec2_instance_facts:
+          aws_access_key: "{{ ec2_access_key }}"
+          aws_secret_key: "{{ ec2_secret_key }}"
+          region: "{{ ec2_region }}"
+          filters:
+            "tag:ansible_group": "{{ instance_tag }}"
+        register: vmfacts
 
-    - name: Display enumerated list
-      debug: msg="{{ item.instance_id }}"
-      with_items: '{{ vmfacts.instances }}'
-      tags: 
-        - delete 
-        - create
-  when: cloud_provider == 'ec2'
+      - name: Display enumerated list
+        debug: msg="{{ item.instance_id }}"
+        with_items: '{{ vmfacts.instances }}'
+      when: cloud_provider == 'ec2'
 
