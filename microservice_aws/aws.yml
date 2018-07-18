@@ -43,7 +43,7 @@
     with_items: "{{ ec2.instances }}"
     tags: create
 
-  - name: Enumerate all tagged instances in ec2
+  - name: Enumerate ec2 instances by tag
     ec2_instance_facts:
       aws_access_key: "{{ ec2_access_key }}"
       aws_secret_key: "{{ ec2_secret_key }}"
@@ -55,13 +55,14 @@
       - delete
       - create
 
-  - debug: msg="{{ item.instance_id }}"
+  - name: Display enumerated list
+    debug: msg="{{ item.instance_id }}"
     with_items: '{{ vmfacts.instances }}'
     tags: 
       - delete 
       - create
 
-  - name: Delete ami instance in ec2
+  - name: Delete instances using enumerated list
     ec2:
       aws_access_key: "{{ ec2_access_key }}"
       aws_secret_key: "{{ ec2_secret_key }}"
