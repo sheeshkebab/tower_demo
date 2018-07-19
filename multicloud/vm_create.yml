@@ -130,12 +130,12 @@
           resource_group: "{{ resource_group }}"
           name: webserver
           vm_size: Standard_DS1_v2
-          admin_username: azureuser
+          admin_username: ec2-user
           admin_password: Password@123
           tags:
             tag_ansible_group : webservers
           ssh_public_keys:
-            - path: /home/azureuser/.ssh/authorized_keys
+            - path: /home/ec2-user/.ssh/authorized_keys
               key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClKymYHNpAnt+WNwkQglhYNRb8dnFOyxduXORciKkb7fGE1li1MokcL9lgGmRPacueI3ssSvjvZzXBT0p2H2jrNfRKvI7vLTBIPq/cfVzBbYgSselELb0IMob5AKht/FS6k++Obmz5GZj+HLzBwDTTEwTJfWu+joc2dTdOWtiFQjzQJLjzyFGR/Kt5WtucS62rfPGp1jqqZ75EmxfiRJaGziTgdO8Nns/9fMpUanqYF0LOWhuK+RJK3YDPo40PIpiykNgqss+s/tID4qwfonl7/JJWoHyYTRGK+c7xV2FukGIH4eLy3+ufEI4JVMR7GLEQljVo1AvwF66mnyoemuur etg-richard 
           network_interfaces: webserver
           image:
@@ -163,12 +163,12 @@
           resource_group: "{{ resource_group }}"
           name: dbserver
           vm_size: Standard_DS1_v2
-          admin_username: azureuser
+          admin_username: ec2-user 
           admin_password: Password@123
           tags:
             tag_ansible_group : dbservers
           ssh_public_keys:
-            - path: /home/azureuser/.ssh/authorized_keys
+            - path: /home/ec2-user/.ssh/authorized_keys
               key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClKymYHNpAnt+WNwkQglhYNRb8dnFOyxduXORciKkb7fGE1li1MokcL9lgGmRPacueI3ssSvjvZzXBT0p2H2jrNfRKvI7vLTBIPq/cfVzBbYgSselELb0IMob5AKht/FS6k++Obmz5GZj+HLzBwDTTEwTJfWu+joc2dTdOWtiFQjzQJLjzyFGR/Kt5WtucS62rfPGp1jqqZ75EmxfiRJaGziTgdO8Nns/9fMpUanqYF0LOWhuK+RJK3YDPo40PIpiykNgqss+s/tID4qwfonl7/JJWoHyYTRGK+c7xV2FukGIH4eLy3+ufEI4JVMR7GLEQljVo1AvwF66mnyoemuur etg-richard 
           network_interfaces: dbserver
           image:
