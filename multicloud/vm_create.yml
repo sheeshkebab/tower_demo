@@ -12,18 +12,79 @@
   tasks:
   
     - block:
-      - name: Enumerate ec2 instances by tag
-        ec2_instance_facts:
+      - name: Launch webserver instances
+        ec2:
+          image: "{{ ec2_image }}"
+          instance_type: "{{ ec2_instance_type }}"
           aws_access_key: "{{ ec2_access_key }}"
           aws_secret_key: "{{ ec2_secret_key }}"
+          key_name: "{{ ec2_keypair }}"
           region: "{{ ec2_region }}"
-          filters:
-            "tag:ansible_group": "{{ instance_tag }}"
-        register: vmfacts
+          wait: true
+          count: "{{ ec2_webserver_instance_count }}"
+          instance_tags: "{'ansible_group':'webservers', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'demo_''{{ tower_user_name }}'}"
+          vpc_subnet_id: "{{ ec2_subnet_id }}"
+          assign_public_ip: yes
+          group_id: "{{ ec2_security_group }}"
+        register: ec2
 
-      - name: Display enumerated list
-        debug: msg="{{ item.instance_id }}"
-        with_items: '{{ vmfacts.instances }}'
+      - name: Launch database instance
+        ec2:
+          image: "{{ ec2_image }}"
+          instance_type: "{{ ec2_instance_type }}"
+          aws_access_key: "{{ ec2_access_key }}"
+          aws_secret_key: "{{ ec2_secret_key }}"
+          key_name: "{{ ec2_keypair }}"
+          region: "{{ ec2_region }}"
+          wait: true
+          count: "{{ ec2_dbserver_instance_count|int }}"
+          instance_tags: "{'ansible_group':'dbservers', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'demo_''{{ tower_user_name }}'}"
+          vpc_subnet_id: "{{ ec2_subnet_id }}"
+          assign_public_ip: yes
+          group_id: "{{ ec2_security_group }}"  # or you can say 'default' here
+        register: ec2
+
+      - name: Launch load balancing instance
+        ec2:
+          image: "{{ ec2_image }}"
+          instance_type: "{{ ec2_instance_type }}"
+          aws_access_key: "{{ ec2_access_key }}"
+          aws_secret_key: "{{ ec2_secret_key }}"
+          key_name: "{{ ec2_keypair }}"
+          region: "{{ ec2_region }}"
+          wait: true
+          count: "{{ ec2_lbserver_instance_count|int }}"
+          instance_tags: "{'ansible_group':'lbservers', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'demo_''{{ tower_user_name }}'}"
+          vpc_subnet_id: "{{ ec2_subnet_id }}"
+          assign_public_ip: yes
+          group_id: "{{ ec2_security_group }}"  # or you can say 'default' here
+        register: ec2
+
+      - name: Launch monitoring instance
+        ec2:
+          image: "{{ ec2_image }}"
+          instance_type: "{{ ec2_instance_type }}"
+          aws_access_key: "{{ ec2_access_key }}"
+          aws_secret_key: "{{ ec2_secret_key }}"
+          key_name: "{{ ec2_keypair }}"
+          region: "{{ ec2_region }}" 
+          wait: true
+          count: "{{ ec2_monitoring_instance_count|int }}"
+          instance_tags: "{'ansible_group':'monitoring', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'demo_''{{ tower_user_name }}'}"
+          vpc_subnet_id: "{{ ec2_subnet_id }}"
+          assign_public_ip: yes
+          group_id: "{{ ec2_security_group }}"  # or you can say 'default' here
+        register: ec2
+
+      - name: Wait for SSH to come up
+        wait_for:
+          host: "{{ item.public_dns_name }}"
+          port: 22
+          delay: 60
+          timeout: 320
+          state: started
+        with_items: "{{ ec2.instances }}"
+
       when: cloud_provider == 'ec2'
 
     - block:
@@ -38,11 +99,6 @@
           name: "{{ vm_name }}"
           address_prefix: "10.0.1.0/24"
           virtual_network: "{{ vm_name }}"
-      - name: Create public IP address
-        azure_rm_publicipaddress:
-          resource_group: "{{ resource_group }}"
-          allocation_method: Static
-          name: "{{ vm_name }}"
       - name: Create Network Security Group that allows SSH
         azure_rm_securitygroup:
           resource_group: "{{ resource_group }}"
@@ -54,18 +110,58 @@
               access: Allow
               priority: 1001
               direction: Inbound
+
+      # Create Webserver
+      - name: Create public IP address
+        azure_rm_publicipaddress:
+          resource_group: "{{ resource_group }}"
+          allocation_method: Static
+          name: webserver
       - name: Create virtual network inteface card
         azure_rm_networkinterface:
           resource_group: "{{ resource_group }}"
-          name: "{{ vm_name }}"
+          name: webserver
           virtual_network: "{{ vm_name }}"
           subnet: "{{ vm_name }}"
-          public_ip_name: "{{ vm_name }}"
+          public_ip_name: webserver
           security_group: "{{ vm_name }}"
       - name: Create VM
         azure_rm_virtualmachine:
           resource_group: "{{ resource_group }}"
-          name: "{{ vm_name }}"
+          name: webserver
+          vm_size: Standard_DS1_v2
+          admin_username: azureuser
+          admin_password: Password@123
+          tags:
+            tag_ansible_group : webservers
+          ssh_public_keys:
+            - path: /home/azureuser/.ssh/authorized_keys
+              key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClKymYHNpAnt+WNwkQglhYNRb8dnFOyxduXORciKkb7fGE1li1MokcL9lgGmRPacueI3ssSvjvZzXBT0p2H2jrNfRKvI7vLTBIPq/cfVzBbYgSselELb0IMob5AKht/FS6k++Obmz5GZj+HLzBwDTTEwTJfWu+joc2dTdOWtiFQjzQJLjzyFGR/Kt5WtucS62rfPGp1jqqZ75EmxfiRJaGziTgdO8Nns/9fMpUanqYF0LOWhuK+RJK3YDPo40PIpiykNgqss+s/tID4qwfonl7/JJWoHyYTRGK+c7xV2FukGIH4eLy3+ufEI4JVMR7GLEQljVo1AvwF66mnyoemuur etg-richard 
+          network_interfaces: webserver
+          image:
+            offer: UbuntuServer
+            publisher: Canonical
+            sku: 16.04-LTS
+            version: latest
+
+      # Create dbserver
+      - name: Create public IP address
+        azure_rm_publicipaddress:
+          resource_group: "{{ resource_group }}"
+          allocation_method: Static
+          name: dbserver
+      - name: Create virtual network inteface card
+        azure_rm_networkinterface:
+          resource_group: "{{ resource_group }}"
+          name: dbserver
+          virtual_network: "{{ vm_name }}"
+          subnet: "{{ vm_name }}"
+          public_ip_name: dbserver
+          security_group: "{{ vm_name }}"
+      - name: Create VM
+        azure_rm_virtualmachine:
+          resource_group: "{{ resource_group }}"
+          name: dbserver
           vm_size: Standard_DS1_v2
           admin_username: azureuser
           admin_password: Password@123
@@ -73,14 +169,13 @@
             tag_ansible_group : dbservers
           ssh_public_keys:
             - path: /home/azureuser/.ssh/authorized_keys
-              key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvPIk3XwY76TivmgSZUK0sZam7w3iOPrvgNH1j4z3xieN2mHTVaPVPJ+wzzb/1BTs+cefFzV40f7n5AQa8ClZ4zAJ25mC2aEMRljn1fTcazFuVrEWEp8UjsR8Bz3AAu7oX7akZ4TzhgClP1oK9qmtYN4kTT+h+T72NXg/i62QsO0PXD5W6fPk8Xy2uCvCcHIrmwJqyYHWAIZ8++dRF3hQJTEIHfNxWGdD74+o2hUaAwq+zeVXGX8DmWrptvbzww3domvr0ax3du1pNMOLMee6XhYnmrJniboUB4vM/G3yVBR+V7dBFoGiv+5NVzv3DH6LZ+fUSVyKYlriME5c0TX0z vagrant@localhost.localdomain 
-          network_interfaces: "{{ vm_name }}"
+              key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClKymYHNpAnt+WNwkQglhYNRb8dnFOyxduXORciKkb7fGE1li1MokcL9lgGmRPacueI3ssSvjvZzXBT0p2H2jrNfRKvI7vLTBIPq/cfVzBbYgSselELb0IMob5AKht/FS6k++Obmz5GZj+HLzBwDTTEwTJfWu+joc2dTdOWtiFQjzQJLjzyFGR/Kt5WtucS62rfPGp1jqqZ75EmxfiRJaGziTgdO8Nns/9fMpUanqYF0LOWhuK+RJK3YDPo40PIpiykNgqss+s/tID4qwfonl7/JJWoHyYTRGK+c7xV2FukGIH4eLy3+ufEI4JVMR7GLEQljVo1AvwF66mnyoemuur etg-richard 
+          network_interfaces: dbserver
           image:
             offer: UbuntuServer
             publisher: Canonical
             sku: 16.04-LTS
             version: latest
-
 
 
       when: cloud_provider == 'azure'
