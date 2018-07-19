@@ -139,9 +139,9 @@
               key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClKymYHNpAnt+WNwkQglhYNRb8dnFOyxduXORciKkb7fGE1li1MokcL9lgGmRPacueI3ssSvjvZzXBT0p2H2jrNfRKvI7vLTBIPq/cfVzBbYgSselELb0IMob5AKht/FS6k++Obmz5GZj+HLzBwDTTEwTJfWu+joc2dTdOWtiFQjzQJLjzyFGR/Kt5WtucS62rfPGp1jqqZ75EmxfiRJaGziTgdO8Nns/9fMpUanqYF0LOWhuK+RJK3YDPo40PIpiykNgqss+s/tID4qwfonl7/JJWoHyYTRGK+c7xV2FukGIH4eLy3+ufEI4JVMR7GLEQljVo1AvwF66mnyoemuur etg-richard 
           network_interfaces: webserver
           image:
-            offer: UbuntuServer
-            publisher: Canonical
-            sku: 16.04-LTS
+            offer: RHEL
+            publisher: RedHat
+            sku: 7.3
             version: latest
 
       # Create dbserver
@@ -172,9 +172,9 @@
               key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClKymYHNpAnt+WNwkQglhYNRb8dnFOyxduXORciKkb7fGE1li1MokcL9lgGmRPacueI3ssSvjvZzXBT0p2H2jrNfRKvI7vLTBIPq/cfVzBbYgSselELb0IMob5AKht/FS6k++Obmz5GZj+HLzBwDTTEwTJfWu+joc2dTdOWtiFQjzQJLjzyFGR/Kt5WtucS62rfPGp1jqqZ75EmxfiRJaGziTgdO8Nns/9fMpUanqYF0LOWhuK+RJK3YDPo40PIpiykNgqss+s/tID4qwfonl7/JJWoHyYTRGK+c7xV2FukGIH4eLy3+ufEI4JVMR7GLEQljVo1AvwF66mnyoemuur etg-richard 
           network_interfaces: dbserver
           image:
-            offer: UbuntuServer
-            publisher: Canonical
-            sku: 16.04-LTS
+            offer: RHEL
+            publisher: RedHat 
+            sku: 7.3 
             version: latest
 
 
