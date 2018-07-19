@@ -7,7 +7,6 @@
 - name : Simple playbook
   hosts: localhost 
   vars:
-    #vm_name: "{{ azure_name }}" 
     cloud_provider: ''
 
   tasks:
