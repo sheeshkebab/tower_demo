@@ -1,0 +1,85 @@
+# Description
+# ===========
+# This playbook create an Azure VM with public IP, and open 22 port for SSH
+# This playbook creates an EC2 VM with public IP, and assign to security group with port 22 open.
+
+---
+- name : Simple playbook
+  hosts: localhost 
+  vars:
+    #vm_name: "{{ azure_name }}" 
+    cloud_provider: ''
+
+  tasks:
+  
+    - block:
+      - name: Enumerate ec2 instances by tag
+        ec2_instance_facts:
+          aws_access_key: "{{ ec2_access_key }}"
+          aws_secret_key: "{{ ec2_secret_key }}"
+          region: "{{ ec2_region }}"
+          filters:
+            "tag:ansible_group": "{{ instance_tag }}"
+        register: vmfacts
+
+      - name: Display enumerated list
+        debug: msg="{{ item.instance_id }}"
+        with_items: '{{ vmfacts.instances }}'
+      when: cloud_provider == 'ec2'
+
+    - block:
+      - name: Create virtual network
+        azure_rm_virtualnetwork:
+          resource_group: "{{ resource_group }}"
+          name: "{{ vm_name }}"
+          address_prefixes: "10.0.0.0/16"
+      - name: Add subnet
+        azure_rm_subnet:
+          resource_group: "{{ resource_group }}"
+          name: "{{ vm_name }}"
+          address_prefix: "10.0.1.0/24"
+          virtual_network: "{{ vm_name }}"
+      - name: Create public IP address
+        azure_rm_publicipaddress:
+          resource_group: "{{ resource_group }}"
+          allocation_method: Static
+          name: "{{ vm_name }}"
+      - name: Create Network Security Group that allows SSH
+        azure_rm_securitygroup:
+          resource_group: "{{ resource_group }}"
+          name: "{{ vm_name }}"
+          rules:
+            - name: SSH
+              protocol: Tcp
+              destination_port_range: 22
+              access: Allow
+              priority: 1001
+              direction: Inbound
+      - name: Create virtual network inteface card
+        azure_rm_networkinterface:
+          resource_group: "{{ resource_group }}"
+          name: "{{ vm_name }}"
+          virtual_network: "{{ vm_name }}"
+          subnet: "{{ vm_name }}"
+          public_ip_name: "{{ vm_name }}"
+          security_group: "{{ vm_name }}"
+      - name: Create VM
+        azure_rm_virtualmachine:
+          resource_group: "{{ resource_group }}"
+          name: "{{ vm_name }}"
+          vm_size: Standard_DS1_v2
+          admin_username: azureuser
+          admin_password: Password@123
+          ssh_public_keys:
+            - path: /home/azureuser/.ssh/authorized_keys
+              key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvPIk3XwY76TivmgSZUK0sZam7w3iOPrvgNH1j4z3xieN2mHTVaPVPJ+wzzb/1BTs+cefFzV40f7n5AQa8ClZ4zAJ25mC2aEMRljn1fTcazFuVrEWEp8UjsR8Bz3AAu7oX7akZ4TzhgClP1oK9qmtYN4kTT+h+T72NXg/i62QsO0PXD5W6fPk8Xy2uCvCcHIrmwJqyYHWAIZ8++dRF3hQJTEIHfNxWGdD74+o2hUaAwq+zeVXGX8DmWrptvbzww3domvr0ax3du1pNMOLMee6XhYnmrJniboUB4vM/G3yVBR+V7dBFoGiv+5NVzv3DH6LZ+fUSVyKYlriME5c0TX0z vagrant@localhost.localdomain 
+          network_interfaces: "{{ vm_name }}"
+          image:
+            offer: UbuntuServer
+            publisher: Canonical
+            sku: 16.04-LTS
+            version: latest
+
+
+
+      when: cloud_provider == 'azure'
