@@ -139,7 +139,7 @@
           name: "{{ item.vmname }}NIC"
           virtual_network: "{{ vm_name }}"
           subnet: "{{ vm_name }}"
-          public_ip_name: webserver
+          public_ip_name: "{{ item.vmname }}IP"
           security_group: "{{ vm_name }}"
         with_items : "{{ azurewebservers }}"
       - name: Create VM
