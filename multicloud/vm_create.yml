@@ -10,7 +10,7 @@
     cloud_provider: ''
     azurewebservers:
       - { vmname: 'webserver1', nic: 'webserver1' }
-      - { vmname: 'webserver2', nic: 'webserver1' }
+      - { vmname: 'webserver2', nic: 'webserver2' }
 
   tasks:
 
@@ -160,7 +160,7 @@
             publisher: RedHat
             sku: 7.3
             version: latest
-        with_items: azurewebservers
+        with_items: "{{ azurewebservers }}"
 
       # Create dbserver
       - name: Create public IP address
