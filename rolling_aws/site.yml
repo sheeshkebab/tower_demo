@@ -9,6 +9,13 @@
   - geerlingguy.repo-epel
   - common
 
+  tasks:
+  - name: stop iptables - it's more unhelpful than helpful right now.
+    service: name=iptables state=stopped
+
+  - name: disable iptables on boot.
+    service: name=iptables enabled=no
+
 # Configure and deploy database servers.
 - hosts: tag_ansible_group_dbservers
   become: true
