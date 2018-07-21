@@ -12,10 +12,12 @@
       - { vmname: 'webserver1', nic: 'webserver1' }
       - { vmname: 'webserver2', nic: 'webserver2' }
 
+    dynamic_inventory_tag: []
+
   tasks:
 
     - block:
-      - name: Launch webserver instances
+      - name: EC2 Launch webserver instances
         ec2:
           image: "{{ ec2_image }}"
           instance_type: "{{ ec2_instance_type }}"
@@ -31,7 +33,7 @@
           group_id: "{{ ec2_security_group }}"
         register: ec2
 
-      - name: Launch database instance
+      - name: EC2 Launch database instance
         ec2:
           image: "{{ ec2_image }}"
           instance_type: "{{ ec2_instance_type }}"
@@ -47,7 +49,7 @@
           group_id: "{{ ec2_security_group }}"  # or you can say 'default' here
         register: ec2
 
-      - name: Launch load balancing instance
+      - name: EC2 Launch load balancing instance
         ec2:
           image: "{{ ec2_image }}"
           instance_type: "{{ ec2_instance_type }}"
@@ -63,7 +65,7 @@
           group_id: "{{ ec2_security_group }}"  # or you can say 'default' here
         register: ec2
 
-      - name: Launch monitoring instance
+      - name: EC2 Launch monitoring instance
         ec2:
           image: "{{ ec2_image }}"
           instance_type: "{{ ec2_instance_type }}"
@@ -79,7 +81,7 @@
           group_id: "{{ ec2_security_group }}"  # or you can say 'default' here
         register: ec2
 
-      - name: Wait for SSH to come up
+      - name: EC2 Wait for SSH to come up
         wait_for:
           host: "{{ item.public_dns_name }}"
           port: 22
@@ -91,18 +93,18 @@
       when: cloud_provider == 'ec2'
 
     - block:
-      - name: Create virtual network
+      - name: Azure Create virtual network
         azure_rm_virtualnetwork:
           resource_group: "{{ resource_group }}"
           name: "{{ vm_name }}"
           address_prefixes: "10.0.0.0/16"
-      - name: Add subnet
+      - name: Azure Add subnet
         azure_rm_subnet:
           resource_group: "{{ resource_group }}"
           name: "{{ vm_name }}"
           address_prefix: "10.0.1.0/24"
           virtual_network: "{{ vm_name }}"
-      - name: Create Network Security Group that allows SSH
+      - name: Azure Create Network Security Group that allows SSH
         azure_rm_securitygroup:
           resource_group: "{{ resource_group }}"
           name: "{{ vm_name }}"
@@ -113,27 +115,33 @@
               access: Allow
               priority: 1001
               direction: Inbound
-            - name: HTTP 
+            - name: HTTP
               protocol: Tcp
-              destination_port_range: 80 
+              destination_port_range: 80
               access: Allow
               priority: 1002
               direction: Inbound
-            - name: HTTPS 
+            - name: HTTPS
               protocol: Tcp
-              destination_port_range: 443 
+              destination_port_range: 443
               access: Allow
               priority: 1003
               direction: Inbound
+            - name: LB
+              protocol: Tcp
+              destination_port_range: 8888
+              access: Allow
+              priority: 1004
+              direction: Inbound
 
       # Create Webserver
-      - name: Create public IP address
+      - name: Azure Create Webserver public IP address
         azure_rm_publicipaddress:
           resource_group: "{{ resource_group }}"
           allocation_method: Static
           name: "{{ item.vmname }}IP"
         with_items : "{{ azurewebservers }}"
-      - name: Create virtual network inteface card
+      - name: Azure Create Webserver virtual network inteface card
         azure_rm_networkinterface:
           resource_group: "{{ resource_group }}"
           name: "{{ item.vmname }}NIC"
@@ -142,7 +150,7 @@
           public_ip_name: "{{ item.vmname }}IP"
           security_group: "{{ vm_name }}"
         with_items : "{{ azurewebservers }}"
-      - name: Create VM
+      - name: Azure Create Webserver VM
         azure_rm_virtualmachine:
           resource_group: "{{ resource_group }}"
           name: "{{ item.vmname }}VM"
@@ -163,12 +171,12 @@
         with_items: "{{ azurewebservers }}"
 
       # Create dbserver
-      - name: Create public IP address
+      - name: Azure Create dbserver public IP address
         azure_rm_publicipaddress:
           resource_group: "{{ resource_group }}"
           allocation_method: Static
           name: dbserver
-      - name: Create virtual network inteface card
+      - name: Azure Create dbserver virtual network inteface card
         azure_rm_networkinterface:
           resource_group: "{{ resource_group }}"
           name: dbserver
@@ -176,7 +184,7 @@
           subnet: "{{ vm_name }}"
           public_ip_name: dbserver
           security_group: "{{ vm_name }}"
-      - name: Create VM
+      - name: Azure Create dbserver VM
         azure_rm_virtualmachine:
           resource_group: "{{ resource_group }}"
           name: dbserver
@@ -196,12 +204,12 @@
             version: latest
 
       # Create load balancer
-      - name: Create public IP address
+      - name: Create load balancer public IP address
         azure_rm_publicipaddress:
           resource_group: "{{ resource_group }}"
           allocation_method: Static
           name: lbservers
-      - name: Create virtual network inteface card
+      - name: Create load balancer virtual network inteface card
         azure_rm_networkinterface:
           resource_group: "{{ resource_group }}"
           name: lbservers
@@ -209,7 +217,7 @@
           subnet: "{{ vm_name }}"
           public_ip_name: lbservers
           security_group: "{{ vm_name }}"
-      - name: Create VM
+      - name: Azure Create load balancer VM
         azure_rm_virtualmachine:
           resource_group: "{{ resource_group }}"
           name: lbservers
@@ -229,12 +237,12 @@
             version: latest
 
       # Create monitoring
-      - name: Create public IP address
+      - name: Create monitoring public IP address
         azure_rm_publicipaddress:
           resource_group: "{{ resource_group }}"
           allocation_method: Static
           name: monitoring
-      - name: Create virtual network inteface card
+      - name: Create monitoring virtual network inteface card
         azure_rm_networkinterface:
           resource_group: "{{ resource_group }}"
           name: monitoring
@@ -242,7 +250,7 @@
           subnet: "{{ vm_name }}"
           public_ip_name: monitoring
           security_group: "{{ vm_name }}"
-      - name: Create VM
+      - name: Aure Create monitoring VM
         azure_rm_virtualmachine:
           resource_group: "{{ resource_group }}"
           name: monitoring
@@ -260,6 +268,16 @@
             publisher: RedHat 
             sku: 7.3 
             version: latest
+        register: output
 
+      - debug: var=output
+
+#
+#  - name: Populate dictionary for inventory import 
+#    set_fact:
+#      dynamic_inventory_tag: "{{ dynamic_inventory_tag|default([]) + [ {'instance_id': item.id, 'ip': item.public_ip} ] }}"
+#      #dynamic_inventory_tag: "{{ dynamic_inventory_tag|default([]) + [ {'instance_id': item.instance_id, 'ip': item.public_ip_address} ] }}"
+#    with_items: "{{ ec2.instances }}"
+# add_host and then delegate_to for triggering the next peiece in the workflow....maybe a handler
 
       when: cloud_provider == 'azure'

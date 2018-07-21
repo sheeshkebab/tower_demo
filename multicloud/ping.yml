@@ -1,0 +1,14 @@
+
+# Description
+# ===========
+# This playbook create an Azure VM with public IP, and open 22 port for SSH
+# This playbook creates an EC2 VM with public IP, and assign to security group with port 22 open.
+
+---
+- name: Ping all inventory
+  hosts: all
+  tasks:
+  
+  - name : Ping Hosts
+    ping:
+ 
