@@ -17,7 +17,7 @@
     service: name=firewalld enabled=no
 
 # Configure and deploy database servers.
-- hosts: tag_ansible_group_dbservers
+- hosts: tag_ansible_group_dbservers, dbservers
   become: true
 
   roles:
@@ -29,7 +29,7 @@
 # Configure and deploy the web servers. Note that we include two roles here,
 # the 'base-apache' role which simply sets up Apache, and 'web' which includes
 # our example web application.
-- hosts: tag_ansible_group_webservers
+- hosts: tag_ansible_group_webservers, webserver*
   become: true
 
   roles:
@@ -40,7 +40,7 @@
   - web
 
 # Configure and deploy the load balancer(s).
-- hosts: tag_ansible_group_lbservers
+- hosts: tag_ansible_group_lbservers, lbservers
   become: true
 
   roles:
@@ -50,7 +50,7 @@
   - lb
 
 # Configure and deploy the Nagios monitoring node(s).
-- hosts: tag_ansible_group_monitoring
+- hosts: tag_ansible_group_monitoring, monitoring
   become: true
 
   roles:
