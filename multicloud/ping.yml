@@ -5,10 +5,10 @@
 # This playbook creates an EC2 VM with public IP, and assign to security group with port 22 open.
 
 ---
-- name: Ping all inventory
+- name: Utility play 
   hosts: all
   tasks:
   
-  - name : Ping Hosts
-    ping:
+  - name : Gathering facts
+    setup:
  
