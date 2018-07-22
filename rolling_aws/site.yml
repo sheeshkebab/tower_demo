@@ -12,11 +12,11 @@
   tasks:
   - name: stop iptables - it's more unhelpful than helpful right now.
     service: name=firewalld state=stopped
-    when: cloud_provider not "ec2"
+    when: cloud_provider == "azure"
 
   - name: disable iptables on boot.
     service: name=firewalld enabled=no
-    when: cloud_provider not "ec2"
+    when: cloud_provider == "azure"
 
 # Configure and deploy database servers.
 - hosts: tag_ansible_group_dbservers, dbservers
