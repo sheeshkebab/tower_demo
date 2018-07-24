@@ -270,7 +270,7 @@
             version: latest
         register: output
 
-      - debug: var=output
+#      - debug: var=output
 
 #
 #  - name: Populate dictionary for inventory import 

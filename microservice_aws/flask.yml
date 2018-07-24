@@ -63,6 +63,14 @@
       dest: /todo/app
     when: app_installed.stat.exists == False
 
+  - name: Move templated config into place
+    template:
+      src: templates/foo.j2
+      dest: /todo/app/services/users.py
+      owner: root 
+      group: root 
+      mode: "u=rwx,g=rx,o=r"
+
 #name: Set microservice listener interface 
 #    lineinfile:
 #      path: /todo/app/dependencies.ini

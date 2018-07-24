@@ -180,6 +180,8 @@
         virtualenv: /todo/venv
       - name: Werkzeug
         virtualenv: /todo/venv
+      - name: ldap3 
+        virtualenv: /todo/venv
 
   pre_tasks:
 
@@ -214,7 +216,16 @@
       dest: /todo/app
     when: app_installed.stat.exists == False
 
-#  - name: Set microservice listener interface 
+
+  - name: Copy file into place
+      src: templates/ldapout.py
+    dest: /todo
+    owner: root
+    group: root
+    mode: 0755
+    backup: yes
+
+#name: Set microservice listener interface 
 #    lineinfile:
 #      path: /todo/app/dependencies.ini
 #      regexp: '^host = \"localhost\"'
