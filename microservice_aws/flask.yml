@@ -58,18 +58,10 @@
  
   - name: install microservice application
     git:
-      repo: 'https://github.com/h4xr/todo.git'
+      #repo: 'https://github.com/h4xr/todo.git'
+      repo: 'https://github.com/sheeshkebab/microservice.git'
       dest: /todo/app
     when: app_installed.stat.exists == False
-
-
-  - name: Copy file into place
-      src: templates/ldapout.py
-      dest: /todo/app
-      owner: root
-      group: root
-      mode: 0755
-      backup: yes
 
 #name: Set microservice listener interface 
 #    lineinfile:
