@@ -1,6 +1,6 @@
 ---
 - name : builds a basic python flask microservice
-  hosts: tag_Ansible_cattle
+  hosts: tag_ansible_group_cattle
   gather_facts: True 
   become: True
 
