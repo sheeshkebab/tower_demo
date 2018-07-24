@@ -1,5 +1,5 @@
 - name: Active Directory Play
-  hosts: ad
+  hosts: tag_ansible_group_cattle 
   tasks:
 
 
