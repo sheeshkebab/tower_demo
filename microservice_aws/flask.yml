@@ -65,7 +65,7 @@
 
   - name: Move templated config into place
     template:
-      src: templates/foo.j2
+      src: templates/users.j2
       dest: /todo/app/services/users.py
       owner: root 
       group: root 
