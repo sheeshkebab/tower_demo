@@ -18,6 +18,7 @@
        company: "{{ company_name }}" 
        password: "{{ user_password }}" 
        state: present
+       description: "{{ first_name }} {{ last_name }}"
        groups:
          - Domain Users
          - Ansible Admins
