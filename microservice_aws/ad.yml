@@ -1,0 +1,31 @@
+- name: Active Directory Play
+  hosts: ad
+  tasks:
+
+
+   - name: ensure the group exists
+     win_domain_group:
+      name: "{{ group_name }}" 
+      scope: global
+      path: CN=Users,DC=redhat,DC=com,DC=au
+
+
+   - name: Ensure user is present
+     win_domain_user:
+       name: bob
+       firstname: "{{ first_name }}" 
+       surname: "{{ last_name }}" 
+       company: "{{ company_name }}" 
+       password: "{{ user_password }}" 
+       state: present
+       groups:
+         - Domain Users
+         - Ansible Admins
+       street: 123 4th St.
+       city: Sometown
+       state_province: IN
+       postal_code: 12345
+       country: US
+       attributes:
+         telephoneNumber: 555-123456
+       path: cn=Users,dc=redhat,dc=com,dc=au
