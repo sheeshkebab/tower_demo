@@ -12,7 +12,7 @@
 
    - name: Ensure user is present
      win_domain_user:
-       name: bob
+       name: "{{ user_name }}" 
        firstname: "{{ first_name }}" 
        surname: "{{ last_name }}" 
        company: "{{ company_name }}" 
