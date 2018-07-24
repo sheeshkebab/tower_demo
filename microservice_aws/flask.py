@@ -1,0 +1,114 @@
+---
+- name : builds a basic python flask microservice
+  hosts: tag_Ansible_cattle
+  gather_facts: True 
+  become: True
+
+  vars:
+    pip_install_packages:
+      - name: click
+        virtualenv: /todo/venv
+      - name: configobj
+        virtualenv: /todo/venv
+      - name: Flask
+        virtualenv: /todo/venv
+      - name: itsdangerous
+        virtualenv: /todo/venv
+      - name: Jinja2
+        virtualenv: /todo/venv
+      - name: MarkupSafe
+        virtualenv: /todo/venv
+      - name: requests
+        virtualenv: /todo/venv
+      - name: simplejson
+        virtualenv: /todo/venv
+      - name: six
+        virtualenv: /todo/venv
+      - name: Werkzeug
+        virtualenv: /todo/venv
+      - name: ldap3 
+        virtualenv: /todo/venv
+
+  pre_tasks:
+
+  - name: Install python virtual env
+    yum:
+      name: python-virtualenv
+      state: present
+
+  roles:
+    - geerlingguy.repo-epel 
+    - geerlingguy.pip
+
+  tasks:
+  
+  - name: install git
+    yum:
+      name: git
+      state: present
+
+  - selinux:
+      state: disabled
+
+#  - name: Disable SElinux permanetly
+#      lineinfile: dest=/etc/sysconfig/selinux state=present create=no regexp='SELINUX=.*' line='SELINUX=disabled'
+
+  - stat: path=/todo/app/dependencies.ini
+    register: app_installed 
+ 
+  - name: install microservice application
+    git:
+      repo: 'https://github.com/h4xr/todo.git'
+      dest: /todo/app
+    when: app_installed.stat.exists == False
+
+
+  - name: Copy file into place
+      src: templates/ldapout.py
+      dest: /todo/app
+      owner: root
+      group: root
+      mode: 0755
+      backup: yes
+
+#name: Set microservice listener interface 
+#    lineinfile:
+#      path: /todo/app/dependencies.ini
+#      regexp: '^host = \"localhost\"'
+#      line: 'host = "{{ ansible_eth0["ipv4"]["address"] }}"'
+
+  - name: Start microservice
+    shell: "source venv/bin/activate && cd app && nohup python run.py"
+    args:
+      chdir: /todo
+      executable: /bin/bash
+
+  - yum:
+      name: nginx
+      state: present
+
+  - name: Start service nginx, if not running
+    service:
+      name: nginx
+      state: started
+
+  - name: place ngix api config file into its location
+    copy:
+      src: files/api.conf
+      dest: /etc/nginx/conf.d/api.conf
+      mode: 0644
+    notify: Restart Nginx
+
+  - name: place ngix config file into its location
+    copy:
+      src: files/nginx.conf
+      dest: /etc/nginx/nginx.conf
+      mode: 0644
+    notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      become: true
+      service:
+        name: nginx
+        state: restarted
