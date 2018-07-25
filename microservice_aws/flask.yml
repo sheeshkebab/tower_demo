@@ -42,11 +42,6 @@
 
   tasks:
 
-  - set_fact:
-      domain_name: '{{ domain }}'
-      ansible_ssh_user: '{{ ansible_ssh_user }}'
-      ansible_ssh_pass: '{{ ansible_ssh_pass }}'
-
   - name: install git
     yum:
       name: git

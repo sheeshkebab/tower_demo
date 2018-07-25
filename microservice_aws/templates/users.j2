@@ -54,8 +54,8 @@ def stuff():
   mydict['Users'] = []
   server_name = '172.31.19.18'
   domain_name = {{ domain }} 
-  user_name = {{ ansible_ssh_user }} 
-  password = {{ ansible_ssh_pass }}
+  user_name = {{ ldap_user }} 
+  password = {{ ldap_pass }}
 
   format_string = '{:25} {:>6} {:19} {:19} {}'
   print(format_string.format('User', 'Logins', 'Last Login', 'Expires', 'Description'))
