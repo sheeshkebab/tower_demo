@@ -42,6 +42,12 @@
 
   tasks:
 
+  - name: Set facts
+    set_fact:
+      domain_name: '{{ domain }}'
+      user_name: '{{ username }}'
+      password: '{{ password }}'
+
   - name: install git
     yum:
       name: git
