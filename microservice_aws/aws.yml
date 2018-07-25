@@ -8,7 +8,7 @@
     #subnet_id: 'subnet-c3295a8a'
     #ssh_key_name: 'etg-richard'
     #instance_size: 't2.micro'
-    instance_tag: 'cattle'
+    instance_tag: ''
     #ami_name: 'ami-1987757b'    # This is the RHEL AMI
 
   tasks:
