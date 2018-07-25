@@ -45,8 +45,8 @@
   - name: Set facts
     set_fact:
       domain_name: '{{ domain }}'
-      user_name: '{{ username }}'
-      password: '{{ password }}'
+      my_username: '{{ fed_in_username }}'
+      my_password: '{{ fed_in_password }}'
 
   - name: install git
     yum:

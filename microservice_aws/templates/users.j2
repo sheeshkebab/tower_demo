@@ -54,8 +54,8 @@ def stuff():
   mydict['Users'] = []
   server_name = '172.31.19.18'
   domain_name = {{ domain }} 
-  user_name = {{ username }} 
-  password = '{{ password }}'
+  user_name = {{ my_username }} 
+  password = '{{ my_password }}'
 
   format_string = '{:25} {:>6} {:19} {:19} {}'
   print(format_string.format('User', 'Logins', 'Last Login', 'Expires', 'Description'))
