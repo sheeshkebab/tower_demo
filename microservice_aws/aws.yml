@@ -56,7 +56,7 @@
       - create
 
   - name: Display enumerated list
-    debug: msg="{{ item.instance_id }}"
+    debug: msg="{{ item.instance_id }} {{ item.public_dns_name }}"
     with_items: '{{ vmfacts.instances }}'
     tags: 
       - delete 
@@ -71,3 +71,13 @@
       instance_ids: '{{ item.instance_id }}'
     with_items: '{{ vmfacts.instances }}'
     tags: delete 
+
+#  - name: AWS caller facts
+#    aws_caller_facts:
+#      region "{{ ec2_region }}"
+#    register: whoami
+
+#  - debug: var=whoami
+#    tags:
+#      - delete 
+#      - create
