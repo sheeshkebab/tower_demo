@@ -57,7 +57,7 @@
   - name: Display enumerated list
     #debug: msg="{{ item.public_dns_name }} {{ item.public_ip }} {{ item.private_ip}}"
     debug: msg="IP is {{ item }}"
-    with_items: "{{ ec2.results|map(attribute='ec2.ip_address')|list }}"
+    with_items: "{{ ec2.instances|map(attribute='ec2.instances.ip_address')|list }}"
     #with_items: "{{ ec2.instances }}"
     tags: 
       - delete 
