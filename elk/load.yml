@@ -1,0 +1,26 @@
+---
+- name: Load test data into Elasticsearch index
+  hosts: tag_ansible_group_elknode
+  become: true
+  vars_files:
+    - "group_vars/all"
+
+  tasks:
+
+#  - name: download json data 
+#    get_url:
+#      url: https://download.elastic.co/demos/kibana/gettingstarted/accounts.zip 
+#      dest: /var/tmp/accounts.zip
+#      mode: 0755
+
+  - name: Copy json example data
+    copy:
+      src: files/accounts.json
+      dest: /var/tmp/accounts.json
+      owner: elasticsearch 
+      group: elasticsearch 
+      mode: 0755
+
+  - name: Load accounts data
+    command: "curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/bank/account/_bulk?pretty' --data-binary @/var/tmp/accounts.json"
+

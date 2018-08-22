@@ -1,0 +1,6 @@
+# from galaxy
+- src: geerlingguy-nginx 
+- src: geerlingguy.repo-epel
+- src: geerlingguy.java
+- src: geerlingguy.elasticsearch
+- src: geerlingguy.kibana
