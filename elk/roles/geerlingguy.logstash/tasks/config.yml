@@ -8,6 +8,7 @@
     mode: 0644
   with_items:
     - 01-beats-input.conf
+    - 11-nginx-input.conf
     - 30-elasticsearch-output.conf
   notify: restart logstash
 

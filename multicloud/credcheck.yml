@@ -1,0 +1,18 @@
+# Description
+# ===========
+# This playbook create an Azure VM with public IP, and open 22 port for SSH
+# This playbook creates an EC2 VM with public IP, and assign to security group with port 22 open.
+
+---
+- name : Simple playbook
+  hosts: localhost 
+  gather_facts: False
+  vars:
+
+  tasks:
+
+    - block:
+      - debug: msg={{ ec2_access_key }}
+      - debug: msg={{ ec2_secret_key }}
+      #- debug: msg={{ lookup('env', 'AWS_ACCESS_KEY_ID') }}
+      #- debug: msg={{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}
