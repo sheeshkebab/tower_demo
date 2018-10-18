@@ -1,7 +1,10 @@
 ---
 - name: Basic facts gathering example
   hosts : all
+  gather_facts: no
   tasks:
 
-  - name : Gather Facts
+  - name: collect default set of facts and configuration
     junos_facts:
+      gather_subset: config
+    register: junosfacts

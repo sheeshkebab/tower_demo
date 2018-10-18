@@ -1,7 +1,0 @@
----
-- name: Basic facts gathering example
-  hosts : all
-  tasks:
-
-  - name : Gather Facts
-    junos_facts:
