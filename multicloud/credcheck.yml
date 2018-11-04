@@ -1,7 +1,8 @@
 # Description
 # ===========
 # This playbook prints our hidden variables....
-# Its a good reason why we have to improve coding practices
+# Must always observe what is being checked into your repo..
+# Implement good coding practices
 
 ---
 - name : Show my credentials
