@@ -9,6 +9,9 @@
   hosts: localhost 
   gather_facts: False
   vars:
+    machine:
+      username: '{{ ansible_user }}'
+      password: '{{ ansible_password }}'
 
   tasks:
 
@@ -17,3 +20,4 @@
       - debug: msg={{ ec2_secret_key }}
       #- debug: msg={{ lookup('env', 'AWS_ACCESS_KEY_ID') }}
       #- debug: msg={{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}
+      - debug: msg={{ machine }}
