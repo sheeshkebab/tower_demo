@@ -29,12 +29,12 @@ Edit the `ssh-cfg` file and point it to the location of your AWS secret key so t
 ## Step 4
 Run the aws playbook using the create tag
 
-`ansible-playbook aws.yml --tags "create" --ask-vault-pass`
+`ansible-playbook ../demo/aws.yml --tags "create" --ask-vault-pass`
 
 ## Step 5
 Run the aws playbook using the delete tag to clean up
 
-`ansible-playbook aws.yml --tags "delete" --ask-vault-pass`
+`ansible-playbook ../demo/aws.yml --tags "delete" --ask-vault-pass`
 
 IF YOU DONT SUPPLY A TAG THE PLAYBOOK WILL CREATE AND THEN DELETE ANYTHING INSTANCE WITH THE TAG ASSOCIATED.
 
