@@ -6,8 +6,10 @@
 
   tasks:
 
-  - name: collect default set of facts and configuration
+  - name: collect junos version information 
     junos_command:
       commands: show version
-    #junos_facts:
     register: junos_version
+
+  - name: collect default set of facts and configuration
+    junos_facts:
