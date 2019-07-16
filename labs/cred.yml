@@ -1,0 +1,35 @@
+---
+- name: Add Cred
+  hosts: localhost
+  tasks:
+
+
+  - name: Add Credential Into Tower
+    tower_credential:
+      name: Workshop Credential
+      ssh_key_data: "/home/student11/.ssh/aws-private.pem"
+      kind: ssh
+      organization: Default
+      tower_username: admin
+      tower_password: ansible
+      tower_host: https://localhost
+      tower_verify_ssl: False
+      username: ec2-user
+    run_once: true
+    delegate_to: localhost
+
+
+
+  - name: Add tower project
+    tower_project:
+      name: "Workshop Project"
+      description: "Workshop project"
+      organization: "Default"
+      tower_username: admin
+      tower_password: ansible
+      tower_host: https://localhost
+      tower_verify_ssl: False
+      state: present
+      scm_type: git
+      scm_url: https://github.com/sheeshkebab/tower_demo.git 
+    delegate_to: localhost
