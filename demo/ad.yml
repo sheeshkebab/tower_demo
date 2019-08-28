@@ -1,5 +1,5 @@
-- name: Active Directory Play
-  hosts: all 
+- name: Add a new account to Active Directory
+  hosts: all
   tasks:
 
 
@@ -7,7 +7,7 @@
      win_domain_group:
       name: "{{ group_name }}" 
       scope: global
-      path: CN=Users,DC=redhat,DC=com,DC=au
+      path: CN=Users,DC=redhat,DC=local
 
 
    - name: Ensure user is present
@@ -29,4 +29,4 @@
        country: US
        attributes:
          telephoneNumber: 555-123456
-       path: cn=Users,dc=redhat,dc=com,dc=au
+       path: cn=Users,dc=redhat,dc=local

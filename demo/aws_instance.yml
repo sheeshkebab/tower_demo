@@ -4,12 +4,13 @@
   gather_facts: False
   vars:
     instance_count: 1
-    #security_group: 'sg-036c04403f8194aba'
-    #subnet_id: 'subnet-c3295a8a'
-    #ssh_key_name: 'etg-richard'
-    #instance_size: 't2.micro'
     instance_tag: ''
-    #ami_name: 'ami-1987757b'    # This is the RHEL AMI
+    # Define these variables either in this playbook or via the Twoer survey feature.
+    #security_group: ''
+    #subnet_id: ''
+    #ssh_key_name: ''
+    #instance_size: ''
+    #ami_name: ''
 
   tasks:
   # https://aws.amazon.com/ec2/instance-types/
