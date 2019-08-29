@@ -24,6 +24,7 @@
       vpc_subnet_id: "{{ ec2_subnet_id }}"
       assign_public_ip: yes
       group_id: "{{ ec2_security_group }}"
+      zone: ap-southeast-2a
     register: ec2
 
   - name: Launch database instance
