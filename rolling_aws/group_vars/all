@@ -10,15 +10,15 @@ ec2_monitoring_instance_count: 1
 
 # AWS specific variables
 ec2_access_key: ''
-ec2_secret_key: '' 
+ec2_secret_key: ''
 ec2_region: ap-southeast-2
-ec2_image: ami-1987757b
-ec2_instance_type: m1.small
+ec2_image: ami-01cd4a15cb4760ebc
+ec2_instance_type: m1.medium
 ec2_keypair: etg-richard-org
-ec2_security_group: sg-042d2c40313c190a8 
+ec2_security_group: sg-042d2c40313c190a8
 ec2_subnet_id: subnet-1ac47d42
 instance_tag: 'cattle'
 wait_for_port: 22
 
 # overridden by Tower
-tower_user_name: rjh 
+tower_user_name: rjh
