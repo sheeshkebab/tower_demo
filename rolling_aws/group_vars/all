@@ -13,7 +13,7 @@ ec2_access_key: ''
 ec2_secret_key: ''
 ec2_region: ap-southeast-2
 ec2_image: ami-01cd4a15cb4760ebc
-ec2_instance_type: t1.medium
+ec2_instance_type: t2.medium
 ec2_keypair: etg-richard-org
 ec2_security_group: sg-042d2c40313c190a8
 ec2_subnet_id: subnet-1ac47d42
