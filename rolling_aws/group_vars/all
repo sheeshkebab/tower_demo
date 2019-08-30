@@ -22,3 +22,5 @@ wait_for_port: 22
 
 # overridden by Tower
 tower_user_name: rjh
+
+deprecation_warnings: false
