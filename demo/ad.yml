@@ -1,5 +1,6 @@
 - name: Add a new account to Active Directory
   hosts: all
+  gather_facts: false
   tasks:
 
 
