@@ -1,0 +1,49 @@
+[sssd]
+services = nss, pam, ssh, autofs
+config_file_version = 2
+domains = {{ krb5_realm }} 
+
+[domain/{{ krb5_realm }}]
+id_provider = ad
+# Uncomment and configure below , if service discovery is not working
+auth_provider = ad
+ad_server = {{ kdc }}
+
+debug_level = 2
+chpass_provider = ad
+
+cache_credentials = true
+krb5_canonicalize = false
+krb5_kpasswd = {{ kdc }} 
+krb5_realm = {{ krb5_realm }} 
+krb5_server = {{ kdc }} 
+
+#ldap_disable_referrals = true
+ldap_force_upper_case_realm = true
+ldap_id_mapping = True
+
+ldap_sasl_authid = {{ ansible_hostname | upper }}$@{{ krb5_realm }}
+ldap_sasl_mech = GSSAPI
+
+ldap_schema = ad
+ldap_search_base = {{ ldap_user_search_base }} 
+ad_server = {{ kdc }} 
+
+access_provider = ldap
+ldap_access_order = filter, expire
+ldap_account_expire_policy = ad
+ldap_access_filter = memberOf=CN=Ansible Admins,CN=Users,DC=redhat,DC=local
+
+min_id = 2000
+
+enumerate = true
+
+[nss]
+debug_level = 2
+fallback_homedir = /home/%d/%u
+default_shell = /bin/bash
+filter_users = root
+filter_groups = root
+
+[pam]
+

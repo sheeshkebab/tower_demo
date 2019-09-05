@@ -1,0 +1,82 @@
+---
+  - name: Install packages
+    yum:
+       name:
+         - adcli
+         - samba-common
+         - sssd
+         - realmd
+         - oddjob
+         - oddjob-mkhomedir
+         - samba-common-tools
+       state: present
+
+  - name: easy install pip
+    easy_install: name=pip
+      
+  - name: Restart the messagebus service, otherwise the realmd service will not start
+    command: systemctl restart messagebus
+
+  - name: enable password authentication
+    replace:
+      path: /etc/ssh/sshd_config
+      regexp: 'PasswordAuthentication no'
+      replace: 'PasswordAuthentication yes'
+
+  - name: restart sshd
+    service:
+      name: sshd
+      state: restarted
+
+  - name: pexpect is required to handle pwd prompt
+    pip: name=pexpect
+
+  - name: Copy realmd.conf
+    template: src=realmd.conf.j2 dest=/etc/realmd.conf mode=0644 owner=root group=root backup=yes force=yes
+
+  - name: Restart the realmd service
+    command: systemctl restart realmd
+
+  - name: Copy sssd.conf
+    template: src=sssd.conf.j2 dest=/etc/sssd/sssd.conf mode=0600 owner=root group=root backup=yes force=yes
+
+  - name: Copy pam configuration 
+    template: src=system-auth-ac.j2 dest=/etc/pam.d/system-auth-ac mode=0600 owner=root group=root backup=yes force=yes
+
+  - name: Join the Domain
+    expect:
+      command: "adcli join redhat.local"
+      responses:
+        Password for *: "{{ bind_password }}"
+    no_log: true
+    register: join_result
+
+  - name: Ensure SSSD is started and enabled on boot
+    service:
+      name: sssd
+      state: started
+      enabled: yes
+
+  - name: Ensure oddjobd for mkhomedir is started and enabled on boot
+    service:
+      name: oddjobd
+      state: started
+      enabled: yes
+
+  - name: Modify PAM settings for makehomedir
+    lineinfile:
+      dest: /etc/pam.d/password-auth-ac
+      line: "session     optional      pam_mkhomedir.so umask=0077"
+      insertafter: "^-session     optional      pam_systemd.so"
+
+  - name: Setup authconfig
+    command: "authconfig --enablesssd --enablesssdauth --enablemkhomedir --update"
+
+  - name: Restart the sssd service
+    command: systemctl restart sssd
+
+#  - name: Copy nscd.conf
+#    template: src=nscd.conf.j2 dest=/etc/nscd.conf mode=0644 owner=root group=root backup=yes force=yes
+
+#  - name: Restart the nscd service
+#    command: systemctl restart nscd

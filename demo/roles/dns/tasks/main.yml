@@ -1,0 +1,73 @@
+---
+  - command: find /etc/sysconfig/network-scripts/ -type f -name "ifcfg-e*"
+    register: eths
+
+  - name: Remove PeerDNS=yes entry
+    lineinfile:
+      path: "{{ item }}"
+      regexp: '^PEERDNS=yes'
+      state: absent
+    with_items: "{{ eths.stdout_lines }}"
+
+  - name: set DNS resolution in ifcfg file
+    blockinfile:
+      dest: "{{ item }}"
+      block: |
+        DNS1=172.31.20.182
+        DOMAIN="{{ ad_domain }} ec2.internal"
+        PEERDNS=no
+    register: dnschange
+    with_items: "{{ eths.stdout_lines }}"
+
+  - name: restart NetworkManager
+    service:
+      name: NetworkManager
+      state: restarted
+    when: dnschange.changed
+
+  - setup:
+
+  - set_fact:
+      new_hostname: "{{ ansible_hostname | regex_findall('\\b(?:[0-9]{1,3}\\-){3}[0-9]{1,3}\\b') }}"
+
+  - debug:
+      var: ansible_hostname
+
+  - debug:
+      var: new_hostname 
+
+
+# Now to configure the hostname so it does not exceed 15 characters
+  - command:
+      argv:
+        - /bin/hostnamectl
+        - set-hostname 
+        - "{{ new_hostname }}"
+
+  #- command:
+  #   name: "{{ new_hostname }}"
+
+  - name: Stop cloud init resetting the hostname upon reboot 
+    lineinfile:
+      path: /etc/cloud/cloud.cfg
+      regexp: ' - set_hostname'
+      line: '# - set_hostname'
+
+  - name: Stop cloud init updating the hostname upon reboot 
+    lineinfile:
+      path: /etc/cloud/cloud.cfg
+      regexp: ' - update_hostname'
+      line: '# - update_hostname'
+
+  # Idempotent way to build a /etc/hosts file with Ansible using your Ansible hosts inventory for a source.
+  # Will include all hosts the playbook is run on.
+  # Credits to rothgar: https://gist.github.com/rothgar/8793800
+#  - name: Build hosts file (backups will be made)
+#    lineinfile: >
+#      dest=/etc/hosts
+#      regexp='{{ hostvars[item].ansible_hostname }}$'
+#      line='{{ hostvars[item].ansible_default_ipv4.address }} {{ item }} {{ hostvars[item].ansible_hostname }}'
+#      state=present
+#      backup=yes
+#    when: hostvars[item].ansible_default_ipv4.address is defined
+#    with_items: groups['all']
