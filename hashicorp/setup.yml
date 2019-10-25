@@ -1,0 +1,6 @@
+---
+- name: Simple Steps - test the credential can be checkout
+  hosts: all
+  tasks:
+
+  - setup:
