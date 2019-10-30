@@ -9,6 +9,7 @@
   with_items:
     - 01-beats-input.conf
     - 11-nginx-input.conf
+    - 16-tower-input.conf
     - 30-elasticsearch-output.conf
   notify: restart logstash
 
@@ -23,9 +24,10 @@
     - 10-syslog.conf
     - 11-nginx.conf
     - 12-apache.conf
-    - 14-solr.conf
-    - 15-drupal.conf
   notify: restart logstash
+
+#    - 14-solr.conf
+#    - 15-drupal.conf
 
 - name: Create Logstash configuration file for local syslog.
   template:
