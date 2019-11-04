@@ -17,11 +17,37 @@
   - name: Restart the messagebus service, otherwise the realmd service will not start
     command: systemctl restart messagebus
 
-  - name: enable password authentication
-    replace:
-      path: /etc/ssh/sshd_config
-      regexp: 'PasswordAuthentication no'
-      replace: 'PasswordAuthentication yes'
+  - name: Copy on trusted ssh keys CA certificate
+    copy:
+      src: trusted-user-ca-keys.pem  
+      dest: '/etc/ssh/trusted-user-ca-keys.pem
+      owner: root
+      group: root
+      mode: 0644 
+
+  - name: copy on new sshd_configuration
+    template:
+      src: sshd_config.j2
+      dest: /etc/ssh/sshd_config
+      owner: root
+      group: root
+      mode: 0644
+      validate='/usr/sbin/sshd -T -f %s'
+
+  - name: Ensure Richard has sudo rights
+    lineinfile:
+      path: /etc/sudoers.d/richard
+      line: 'richard ALL=(ALL) NOPASSWD: ALL'
+      state: present
+      mode: 0440
+      create: yes
+      validate: 'visudo -cf %s'j
+
+#  - name: enable password authentication
+#    replace:
+#      path: /etc/ssh/sshd_config
+#      regexp: 'PasswordAuthentication no'
+#      replace: 'PasswordAuthentication yes'
 
   - name: restart sshd
     service:
