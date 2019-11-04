@@ -31,7 +31,7 @@
       dest: /etc/ssh/sshd_config
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
       validate: '/usr/sbin/sshd -T -f %s'
 
   - name: Ensure Richard has sudo rights
@@ -39,9 +39,9 @@
       path: /etc/sudoers.d/richard
       line: 'richard ALL=(ALL) NOPASSWD: ALL'
       state: present
-      mode: 0440
+      mode: '0440'
       create: yes
-      validate: 'visudo -cf %s'j
+      validate: 'visudo -cf %s'
 
 #  - name: enable password authentication
 #    replace:
