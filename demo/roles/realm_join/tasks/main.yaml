@@ -33,14 +33,22 @@
       group: root
       mode: 0644
 
-  - name: Ensure Richard has sudo rights
-    lineinfile:
-      path: /etc/sudoers.d/richard
-      line: 'richard ALL=(ALL) NOPASSWD: ALL'
-      state: present
-      mode: '0440'
-      create: yes
-      validate: 'visudo -cf %s'
+  - name: copy on sudoers 
+    template:
+      src: sudoers.j2
+      dest: /etc/sudoers.d/richard
+      owner: root
+      group: root
+      mode: 0440
+
+#  - name: Ensure Richard has sudo rights
+#    lineinfile:
+#      path: /etc/sudoers.d/richard
+#      line: 'richard ALL=(ALL) NOPASSWD: ALL'
+#      state: present
+#      mode: '0440'
+#      create: yes
+#      validate: 'visudo -cf %s'
 
 #  - name: enable password authentication
 #    replace:
