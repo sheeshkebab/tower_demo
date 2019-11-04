@@ -19,11 +19,11 @@
 
   - name: Copy on trusted ssh keys CA certificate
     copy:
-      src: trusted-user-ca-keys.pem  
+      src: trusted-user-ca-keys.pem
       dest: '/etc/ssh/trusted-user-ca-keys.pem
       owner: root
       group: root
-      mode: 0644 
+      mode: 0644
 
   - name: copy on new sshd_configuration
     template:
@@ -33,7 +33,7 @@
       group: root
       mode: 0644
 
-  - name: copy on sudoers 
+  - name: copy on sudoers
     template:
       src: sudoers.j2
       dest: /etc/sudoers.d/richard
