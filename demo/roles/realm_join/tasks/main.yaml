@@ -32,7 +32,7 @@
       owner: root
       group: root
       mode: 0644
-      #validate: '/usr/sbin/sshd -T -f %s'
+#      validate: '/usr/sbin/sshd -T -f %s'
 
   - name: Ensure Richard has sudo rights
     lineinfile:
