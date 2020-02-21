@@ -1,0 +1,6 @@
+---
+- name: Basic Ping Check
+  hosts: all
+  tasks:
+
+  - ping:
