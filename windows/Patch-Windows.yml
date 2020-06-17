@@ -1,16 +1,13 @@
 ---
 - name : This playbook will run windows update
-  hosts: windows 
+  hosts: tag_Workshop_type_windows:windows 
   vars:
     patches:
       - windows10.0-kb4562562-x64_85f4082ff8a2f8bd870495fe864b00306322d0ea.msu 
 #      - windows8.1-kb4344153-x64_be2840f79f50b30e571b229863d5993dfcda0e0d.msu
 #      - windows8.1-kb4344145-x64_a8ab9af74e4ff58bb942494ac0d442b9fa2138ca.msu
 #      - windows8.1-kb4344147-x64_776ef21945d613cf0eb93a7b3f5e3af61fef83b0.msu
-
   tasks:
-
-
 #  - name: Update but Exlude updates based on the update title
 #    win_updates:
 #      category_name:
@@ -35,13 +32,8 @@
     with_items: "{{ patches }}"
     register: hotfix_install
 
-
-
 # KB3191564
 # KB4345592
-#  KB4344153
-#  KB4344154
-#  KB4344147
-# 
+#
 #  - win_reboot:
 #    when: hotfix_install.reboot_required
