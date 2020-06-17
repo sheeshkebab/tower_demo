@@ -1,0 +1,6 @@
+---
+- name: Install Windows WS apps
+  hosts: tag_Workshop_type_windows
+  gather_facts: true
+  roles:
+    - windows_ws_setup

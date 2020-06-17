@@ -26,17 +26,17 @@
     - workshop_check_setup
     - aws_check_setup
     - manage_ec2_instances
-    - windows_ws_setup
+    #- windows_ws_setup
 
-- name: Add Ansible User 
-  hosts: windows
+- name: Add Ansible User
+  hosts: tag_Workshop_type_windows:windows
   gather_facts: true
   tasks:
-    - name: Set the password poloicy 
+    - name: Set the password poloicy
       win_security_policy:
         section: System Access
         key: PasswordComplexity
-        value: 0 
+        value: 0
 
     - name: Replace password
       win_user:
