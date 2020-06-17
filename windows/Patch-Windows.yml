@@ -13,6 +13,8 @@
       category_name:
       - SecurityUpdates
       - CriticalUpdates
+      - Definition Updates
+      - Microsoft Defender Antivirus
       #blacklist:
       #- Windows Malicious Software Removal Tool x64 - August 2018 (KB890830)
       #- \d{4}-\d{2} Security Monthly Quality Rollup for Windows Server 2012 R2 for x64-based Systems (KB4343898)
