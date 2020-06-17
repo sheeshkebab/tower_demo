@@ -31,6 +31,8 @@
 - name: Add Ansible User
   hosts: tag_Workshop_type_windows:windows
   gather_facts: true
+  vars:
+    ansible_windows_password: Ansible+Red*Hat19!20
   tasks:
     - name: Set the password poloicy
       win_security_policy:
