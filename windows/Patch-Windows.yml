@@ -1,6 +1,6 @@
 ---
 - name : This playbook will run windows update
-  hosts: tag_Workshop_type_windows:windows 
+  hosts: tag_Workshop_type_windows
   vars:
     patches:
       - windows10.0-kb4562562-x64_85f4082ff8a2f8bd870495fe864b00306322d0ea.msu 
