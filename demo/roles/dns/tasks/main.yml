@@ -19,18 +19,45 @@
         PEERDNS=no
     with_items: "{{ eths.stdout_lines }}"
 
-  - name: set DNS resolution in ifcfg file
-    blockinfile:
-      dest: /etc/NetworkManager/NetworkManager.conf 
-      block: |
-        dns=none
-    register: dnschange
+  - name: make sure line 'dns=none' is set in /etc/NetworkManager/NetworkManager.conf
+    ini_file:
+      path: /etc/NetworkManager/NetworkManager.conf
+      state: present
+      no_extra_spaces: yes
+      section: main
+      option: dns
+      value: none
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+    notify:
+      - reload NetworkManager
 
-  - name: restart NetworkManager
-    service:
-      name: NetworkManager
-      state: restarted
-    when: dnschange.changed
+
+  - name: deploy resolv.conf template
+    template:
+      src: templates/resolv.conf.j2
+      dest: /etc/resolv.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+    notify:
+      - reload NetworkManager
+
+#  - name: set DNS resolution in ifcfg file
+#    blockinfile:
+#      dest: /etc/NetworkManager/NetworkManager.conf 
+#      block: |
+#        dns=none
+#    register: dnschange
+
+#  - name: restart NetworkManager
+#    service:
+#      name: NetworkManager
+#      state: restarted
+#    when: dnschange.changed
 
 #  - name: Replace search domain entry
 #    lineinfile:
@@ -68,12 +95,12 @@
   - debug:
       var: new_hostname 
 
-  - name: set DNS resolution in resolv.conf
-    blockinfile:
-      dest: /etc/resolv.conf
-      block: |
-        search "{{ ad_domain }} ec2.internal"
-        nameserver 172.31.20.182
+#  - name: set DNS resolution in resolv.conf
+#    blockinfile:
+#      dest: /etc/resolv.conf
+#      block: |
+#        search "{{ ad_domain }} ec2.internal"
+#        nameserver 172.31.20.182
 
 # Now to configure the hostname so it does not exceed 15 characters
   - name: Set new hostname
