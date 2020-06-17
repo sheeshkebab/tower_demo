@@ -1,5 +1,5 @@
 ---
-- name: Destroy lab instances in AWS
+- name: Destroy windows instances in AWS
   hosts: localhost
   connection: local
   become: false
@@ -11,6 +11,19 @@
     s3_state: absent
     state: absent
     debug_teardown: false
+
+    admin_password: ansible123
+    ansible_windows_password: Ansible+Red*Hat19!20
+    ec2_name_prefix: WINDOWSDEMO
+    ec2_region: ap-southeast-2
+    instance_loc: ec2
+    student_total: 1
+    towerinstall: false
+    workshop_type: windows
+
+
+
+
 
   tasks:
     - {include_role: {name: manage_ec2_instances}}
