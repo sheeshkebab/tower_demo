@@ -27,39 +27,25 @@
     - workshop_check_setup
     - aws_check_setup
     - manage_ec2_instances
+    - windows_ws_setup
 
-#- name: Create lab instances in AWS
-#  hosts: localhost
-#  connection: local
-#  become: false
-#  gather_facts: false
-#  roles:
-#    - manage_ec2_instances
+- name: Add Ansible User 
+  hosts: windows
+  gather_facts: true
+  tasks:
+    - name: Set the password poloicy 
+      win_security_policy:
+        section: System Access
+        key: PasswordComplexity
+        value: 0 
 
-#- name: Install Windows WS apps
-#  hosts: windows
-#  gather_facts: true
-#  roles:
-#    - windows_ws_setup
-
-
-#- name: Add Ansible User 
-#  hosts: windows
-#  gather_facts: true
-#  tasks:
-#    - name: Set the password poloicy 
-#      win_security_policy:
-#        section: System Access
-#        key: PasswordComplexity
-#        value: 0 
-
-#    - name: Replace password
-#      win_user:
-#        name: ansible
-#        password: "{{ ansible_windows_password }}"
-#        state: present
-#        groups:
-#          - Administrators
-#      async: 0
-#      poll: 0
+    - name: Replace password
+      win_user:
+        name: ansible
+        password: "{{ ansible_windows_password }}"
+        state: present
+        groups:
+          - Administrators
+      async: 0
+      poll: 0
 
