@@ -34,13 +34,13 @@
   vars:
     ansible_windows_password: Ansible+Red*Hat19!20
   tasks:
-    - name: Set the password poloicy
+    - name: Ease the password policy
       win_security_policy:
         section: System Access
         key: PasswordComplexity
         value: 0
 
-    - name: Replace password
+    - name: Create Ansible automation account user 
       win_user:
         name: ansible
         password: "{{ ansible_windows_password }}"
