@@ -1,2 +1,0 @@
-bind_user: "{{ vault_bind_user }}"
-bind_password: "{{ vault_bind_password }}" 
