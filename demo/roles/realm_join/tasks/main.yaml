@@ -17,8 +17,8 @@
 #  - name: Restart the messagebus service, otherwise the realmd service will not start
 #    command: systemctl restart messagebus
 
-  - name: Restart the messagebus service, otherwise the realmd service will not start
-    command: systemctl restart realmd 
+#  - name: Restart the messagebus service, otherwise the realmd service will not start
+#    command: systemctl restart realmd 
 
   - name: Copy on trusted ssh keys CA certificate
     copy:
@@ -69,7 +69,7 @@
       command: "adcli join redhat.local"
       responses:
         Password for *: "{{ bind_password }}"
-    no_log: true
+    #no_log: true
     register: join_result
 
   - name: Ensure SSSD is started and enabled on boot
