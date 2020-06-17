@@ -2,28 +2,37 @@
   - command: find /etc/sysconfig/network-scripts/ -type f -name "ifcfg-e*"
     register: eths
 
-  - name: Remove PeerDNS=yes entry
-    lineinfile:
-      path: "{{ item }}"
-      regexp: '^PEERDNS=yes'
-      state: absent
-    with_items: "{{ eths.stdout_lines }}"
+#  - name: Remove PeerDNS=yes entry
+#    lineinfile:
+#      path: "{{ item }}"
+#      regexp: '^PEERDNS=yes'
+#      state: absent
+#    with_items: "{{ eths.stdout_lines }}"
 
   - name: set DNS resolution in ifcfg file
     blockinfile:
       dest: "{{ item }}"
       block: |
-        DNS1=172.31.20.182
-        DOMAIN="{{ ad_domain }} ec2.internal"
-        PEERDNS=no
+        search "{{ ad_domain }} ap-southeast.compute.internal"
+        nameserver 172.31.20.182
     register: dnschange
-    with_items: "{{ eths.stdout_lines }}"
+    with_items: '/etc/resolv.conf' 
 
-  - name: restart NetworkManager
-    service:
-      name: NetworkManager
-      state: restarted
-    when: dnschange.changed
+#  - name: set DNS resolution in ifcfg file
+#    blockinfile:
+#      dest: "{{ item }}"
+#      block: |
+#        DNS1=172.31.20.182
+#        DOMAIN="{{ ad_domain }} ec2.internal"
+#        PEERDNS=no
+#    register: dnschange
+#    with_items: "{{ eths.stdout_lines }}"
+
+#  - name: restart NetworkManager
+#    service:
+#      name: NetworkManager
+#      state: restarted
+#    when: dnschange.changed
 
   - setup:
 
