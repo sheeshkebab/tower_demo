@@ -44,12 +44,12 @@
 #      regexp: '^nameserver'
 #      line: nameserver 172.31.20.182
 
-  - name: set DNS resolution in ifcfg file
-    blockinfile:
-      dest: /etc/resolv.conf 
-      block: |
-        search "{{ ad_domain }} ec2.internal"
-        nameserver 172.31.20.182
+#  - name: set DNS resolution in resolv.conf 
+#    blockinfile:
+#      dest: /etc/resolv.conf 
+#      block: |
+#        search "{{ ad_domain }} ec2.internal"
+#        nameserver 172.31.20.182
 
 #  - name: restart NetworkManager
 #    service:
@@ -68,6 +68,12 @@
   - debug:
       var: new_hostname 
 
+  - name: set DNS resolution in resolv.conf
+    blockinfile:
+      dest: /etc/resolv.conf
+      block: |
+        search "{{ ad_domain }} ec2.internal"
+        nameserver 172.31.20.182
 
 # Now to configure the hostname so it does not exceed 15 characters
   - name: Set new hostname
