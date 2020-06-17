@@ -1,10 +1,11 @@
 ---
-#  - command: find /etc/sysconfig/network-scripts/ -type f -name "ifcfg-e*"
-#    register: eths
+  - name: Find ifcfg files
+    command: find /etc/sysconfig/network-scripts/ -type f -name "ifcfg-e*"
+    register: eths
 
   - name: Replace search domain entry
     lineinfile:
-      path: '/etc/resolv.conf' 
+      path: /etc/resolv.conf
       regexp: '^search'
       line: search redhat.local ap-southeast.compute.internal
     register: dnschange
@@ -12,7 +13,7 @@
 
   - name: Replace nameserver entry
     lineinfile:
-      path: '/etc/resolv.conf' 
+      path: /etc/resolv.conf
       regexp: '^nameserver'
       line: nameserver 172.31.20.182
     register: dnschange
@@ -23,6 +24,14 @@
       regexp: '^SELINUX='
       line: SELINUX=disabled
     register: dnschange
+
+  - name: set DNS resolution in ifcfg file
+    blockinfile:
+      dest: "{{ item }}"
+      block: |
+        PEERDNS=no
+    register: dnschange
+    with_items: "{{ eths.stdout_lines }}"
 
 #  - name: set DNS resolution in ifcfg file
 #    blockinfile:
@@ -53,7 +62,8 @@
 
 
 # Now to configure the hostname so it does not exceed 15 characters
-  - command:
+  - name: Set new hostname
+    command:
       argv:
         - /bin/hostnamectl
         - set-hostname 
