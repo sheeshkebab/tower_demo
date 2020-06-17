@@ -4,7 +4,7 @@ ansible_become: true
 tmp_dir: /tmp
 krb5_realm: REDHAT.LOCAL 
 ad_domain: redhat.local 
-resolv_nameservers 172.31.20.182
+resolv_nameservers: 172.31.20.182
 cluster_domain: redhat.local 
 kdc: windc.redhat.local
 computer_ou: OU=Computer_Hosts,DC=redhat,DC=local
