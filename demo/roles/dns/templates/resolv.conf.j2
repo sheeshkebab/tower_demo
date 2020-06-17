@@ -8,9 +8,11 @@ nameserver 172.31.20.182
 #{% if resolv_domain is defined and resolv_domain != "" %}
 #domain {{ resolv_domain }}
 #{% endif %}
+#{% if resolv_nameservers is defined %}
 #{% for ns in resolv_nameservers %}
 #nameserver {{ ns }}
 #{% endfor %}
+#{% endif %}
 #{% if resolv_sortlist is defined and resolv_sortlist | length > 0 %}
 #{% for sl in resolv_sortlist %}
 #sortlist {{ sl }}
