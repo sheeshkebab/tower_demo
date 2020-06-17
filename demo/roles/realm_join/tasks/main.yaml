@@ -14,8 +14,11 @@
   - name: easy install pip
     easy_install: name=pip
       
+#  - name: Restart the messagebus service, otherwise the realmd service will not start
+#    command: systemctl restart messagebus
+
   - name: Restart the messagebus service, otherwise the realmd service will not start
-    command: systemctl restart messagebus
+    command: systemctl restart realmd 
 
   - name: Copy on trusted ssh keys CA certificate
     copy:
