@@ -9,7 +9,7 @@
 #      state: absent
 #    with_items: "{{ eths.stdout_lines }}"
 
-  - name: set DNS resolution in ifcfg file
+  - name: set DNS resolution in resolv.conf 
     blockinfile:
       dest: "{{ item }}"
       block: |
