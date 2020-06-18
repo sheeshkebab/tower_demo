@@ -1,6 +1,6 @@
 ---
 - name: Secure my windows estate
-  hosts: windows
+  hosts: tag_Workshop_type_windows:windows
   tasks:
   - name: Microsoft Online Accounts | microsoft-online-accounts
     win_regedit:
