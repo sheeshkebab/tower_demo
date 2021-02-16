@@ -1,0 +1,9 @@
+---
+- name: aurtomate all the things
+  host: new_environment-X
+  tasks:
+
+  - name: tassk 1
+    ios_facts:
+   
+
