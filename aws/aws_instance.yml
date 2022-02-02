@@ -6,8 +6,8 @@
     instance_count: 1
     instance_tag: ''
     # Access credentials are being set here to support the top level controller credential type.
-    ec2_access_key: "{{ AWS_ACCESS_KEY_ID }}"
-    ec2_secret_key: "{{ AWS_SECRET_ACCESS_KEY }}"
+    ec2_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    ec2_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
     # Define these variables either in this playbook or via the Twoer survey feature.
     #security_group: ''
     #subnet_id: ''
