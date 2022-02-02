@@ -9,11 +9,11 @@
     ec2_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
     ec2_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
     # Define these variables either in this playbook or via the Twoer survey feature.
-    #security_group: ''
-    #subnet_id: ''
-    #ssh_key_name: ''
-    #instance_size: ''
-    #ami_name: ''
+    #ec2_security_group: ''
+    #ec2_subnet_id: ''
+    #ec2_keypair: ''
+    #ec2_instance_type: ''
+    #ec2_ami_name: ''
 
   tasks:
   # https://aws.amazon.com/ec2/instance-types/
