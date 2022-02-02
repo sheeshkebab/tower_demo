@@ -25,9 +25,7 @@
       region: "{{ ec2_region }}" 
       wait: yes 
       count: "{{ instance_count|int }}"
-      instance_tags: "{'ansible_group':'{{ instance_tag }}', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'demo_''{{ tower_user_name }}'}"
-      #instance_tags:
-      #  Ansible: "{{ instance_tag }}"
+      instance_tags: "{'ansible_group':'{{ instance_tag }}', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'toweruser_''{{ tower_user_name }}'}"
       vpc_subnet_id: "{{ ec2_subnet_id }}"
       assign_public_ip: yes
       group_id: "{{ ec2_security_group }}"  # you can say 'default' here
@@ -45,7 +43,7 @@
     tags: create
 
   - name: Enumerate ec2 instances by tag
-    amazon.aws.ec2_instance_facts:
+    amazon.aws.ec2_instance_info:
       aws_access_key: "{{ ec2_access_key }}"
       aws_secret_key: "{{ ec2_secret_key }}"
       region: "{{ ec2_region }}" 
