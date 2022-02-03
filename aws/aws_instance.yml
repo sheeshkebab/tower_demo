@@ -36,6 +36,13 @@
     register: ec2
     tags: create
 
+  - name: Capture new instance metadata
+    amazon.aws.ec2_instance_info:
+      instance_ids:
+        - "{{ item.instance_id }}"
+    with_items: "{{ ec2.instances }}"
+    register: instance_facts 
+
   - name: Wait for SSH to come up
     wait_for:
       host: "{{ item.public_dns_name }}"
@@ -43,7 +50,7 @@
       delay: 60
       timeout: 120
       state: started
-    with_items: "{{ ec2.instances }}"
+    with_items: "{{ instance_facts.network_interfaces }}"
     tags: create
 
   - name: Enumerate ec2 instances by tag
