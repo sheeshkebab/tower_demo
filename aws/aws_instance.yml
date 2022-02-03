@@ -42,8 +42,9 @@
         - "{{ item.instance_id }}"
     with_items: "{{ ec2.instances }}"
     register: instance_facts 
+    tags: create
 
-  - meta: end_play
+  #- meta: end_play
 
   - name: Wait for SSH to come up
     wait_for:
