@@ -49,7 +49,7 @@
 
   - name: Wait for SSH to come up
     wait_for:
-      host: "{{ item.public_dns_name }}"
+      host: "{{ item.public_ip_address }}"
       port: 22
       delay: 60
       timeout: 120
@@ -58,20 +58,20 @@
     #with_items: "{{ ec2.instances|map(attribute='public_ip')|list }}"
     tags: create
 
-  - name: Enumerate ec2 instances by tag
-    amazon.aws.ec2_instance_info:
-      aws_access_key: "{{ ec2_access_key }}"
-      aws_secret_key: "{{ ec2_secret_key }}"
-      region: "{{ ec2_region }}" 
-      filters:
-        "tag:ansible_group": "{{ instance_tag }}" 
-    register: vmfacts 
-    tags: 
-      - delete
+#  - name: Enumerate ec2 instances by tag
+#    amazon.aws.ec2_instance_info:
+#      aws_access_key: "{{ ec2_access_key }}"
+#      aws_secret_key: "{{ ec2_secret_key }}"
+#      region: "{{ ec2_region }}" 
+#      filters:
+#        "tag:ansible_group": "{{ instance_tag }}" 
+#    register: vmfacts 
+#    tags: 
+#      - delete
 
   - name: Display enumerated list
     debug: msg="IP is {{ item }}"
-    with_items: "{{ ec2.instances|map(attribute='public_ip')|list }}"
+    with_items: "{{ ec2.instances|map(attribute='public_ip_address')|list }}"
     tags: 
       - delete 
       - create
