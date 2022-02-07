@@ -26,7 +26,7 @@
       aws_secret_key: "{{ ec2_secret_key }}"
       key_name: "{{ ec2_keypair }}"
       region: "{{ ec2_region }}" 
-      wait: true 
+      wait: yes 
       count: "{{ instance_count|int }}"
       vpc_subnet_id: "{{ ec2_subnet_id }}"
       network:
@@ -68,6 +68,7 @@
     with_items: "{{ instance_facts.network_interfaces }}"
     #with_items: "{{ ec2.instances|map(attribute='public_ip')|list }}"
     tags: create
+    delegate_to: localhost
 
 #  - name: Enumerate ec2 instances by tag
 #    amazon.aws.ec2_instance_info:
