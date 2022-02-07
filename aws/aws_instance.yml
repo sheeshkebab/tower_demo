@@ -39,6 +39,7 @@
   - name: dump ec2 info
     debug:
       msg: "{{ ec2|to_yaml }}"
+    tags: create
 
   - meta: end_play
  
