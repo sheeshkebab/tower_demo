@@ -27,10 +27,12 @@
       key_name: "{{ ec2_keypair }}"
       region: "{{ ec2_region }}" 
       wait: yes 
+      wait_timeout: 600
+      state: started
       count: "{{ instance_count|int }}"
       vpc_subnet_id: "{{ ec2_subnet_id }}"
       network:
-        assign_public_ip: yes
+        assign_public_ip: true
       security_group: "{{ ec2_security_group }}"  # you can say 'default' here
       tags: "{'ansible_group':'{{ instance_tag }}', 'type':'{{ ec2_instance_type }}', 'group':'{{ ec2_security_group }}', 'Name':'toweruser_''{{ tower_user_name }}'}"
     register: ec2
