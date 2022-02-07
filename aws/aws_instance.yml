@@ -36,12 +36,11 @@
     register: ec2
     tags: create
 
-  - name: dump ec2 info
+  - name: dump ec2_instance info
     debug:
-      msg: "{{ ec2|to_yaml }}"
+      msg: "{{ ec2 }}"
     tags: create
 
-  - meta: end_play
  
   - name: Capture new instance metadata
     amazon.aws.ec2_instance_info:
@@ -52,8 +51,15 @@
     register: instance_facts 
     tags: create
 
+  - name: dump instance_facts info
+    debug:
+      msg: "{{ instance_facts }}"
+    tags: create
+
+  - meta: end_play
+
   - name: Wait for SSH to come up
-    wait_for:
+   wait_for:
       host: "{{ item.public_ip_address }}"
       port: 22
       delay: 60
